@@ -28,6 +28,9 @@ spec:
             {{- toYaml .Values.web.resources | nindent 12 }}
           volumeMounts:
             - name: web-config
+              mountPath: /etc/httpd/conf.d/ssl.conf
+              subPath: ssl.conf
+            - name: web-config
               mountPath: /etc/httpd/conf.d/bookstore.conf
               subPath: bookstore.conf
             - name: web-config

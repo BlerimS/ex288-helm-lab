@@ -42,6 +42,9 @@ data:
 
     HTTPServer(("0.0.0.0", {{ .Values.api.port }}), Handler).serve_forever()
   {{- else }}
+  ssl.conf: |
+    # SSL disabled — HTTP only on port {{ .Values.api.port }}.
+
   bookstore-api.conf: |
     Alias /books /var/www/html/books.json
     <Location /books>

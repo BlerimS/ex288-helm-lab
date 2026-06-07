@@ -40,6 +40,9 @@ spec:
               subPath: server.py
             {{- else }}
             - name: api-config
+              mountPath: /etc/httpd/conf.d/ssl.conf
+              subPath: ssl.conf
+            - name: api-config
               mountPath: /etc/httpd/conf.d/bookstore-api.conf
               subPath: bookstore-api.conf
             - name: api-config

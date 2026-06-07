@@ -6,6 +6,10 @@ metadata:
     {{- include "bookstore.labels" . | nindent 4 }}
     app.kubernetes.io/component: web
 data:
+  # Overrides image ssl.conf — certs at /etc/httpd/tls/localhost.crt are not present in the pod.
+  ssl.conf: |
+    # SSL disabled — HTTP only on port {{ .Values.web.port }}.
+
   # Drop-in config — use the image default httpd.conf (includes mime.types, MPM, etc.)
   bookstore.conf: |
     ProxyPass /api/books http://{{ include "bookstore.fullname" . }}-api:{{ .Values.api.port }}/books
