@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bookstore.fullname" . }}-api
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+data:
+  books.json: |
+    {
+      "books": [
+        {{- range $i, $book := .Values.books }}
+        {{- if $i }},{{ end }}
+        {
+          "title": {{ $book.title | quote }},
+          "author": {{ $book.author | quote }},
+          "isbn": {{ $book.isbn | quote }}
+        }
+        {{- end }}
+      ]
+    }
+  {{- if eq (.Values.api.runtime | default "httpd") "python" }}
+  server.py: |
+    import json
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    BOOKS = open("/app/books.json").read()
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path in ("/", "/books", "/books/", "/api/books", "/api/books/"):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(BOOKS.encode())
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+        def log_message(self, format, *args):
+            return
+
+    HTTPServer(("0.0.0.0", {{ .Values.api.port }}), Handler).serve_forever()
+  {{- else }}
+  httpd.conf: |
+    Listen {{ .Values.api.port }}
+    ServerRoot "/etc/httpd"
+    DocumentRoot "/var/www/html"
+    <Directory "/var/www/html">
+      Require all granted
+    </Directory>
+    Alias /books /var/www/html/books.json
+    <Location /books>
+      Header set Content-Type "application/json"
+    </Location>
+  {{- end }}

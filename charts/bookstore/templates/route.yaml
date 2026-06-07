@@ -1,0 +1,22 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.route.name }}
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  host: {{ required "route.host is required (e.g. bookstore-devel.apps.cluster.example.com)" .Values.route.host }}
+  to:
+    kind: Service
+    name: {{ include "bookstore.fullname" . }}-web
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.route.tls.enabled }}
+  tls:
+    termination: {{ .Values.route.tls.termination }}
+    insecureEdgeTerminationPolicy: {{ .Values.route.tls.insecureEdgeTerminationPolicy }}
+  {{- end }}
+{{- end }}

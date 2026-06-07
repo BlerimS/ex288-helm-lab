@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookstore-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bookstore-api
+  template:
+    metadata:
+      labels:
+        app: bookstore-api
+    spec:
+      containers:
+        - name: bookstore-api
+          image: image-registry.openshift-image-registry.svc:5000/bookstore-cicd/bookstore-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080

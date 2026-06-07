@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bookstore.fullname" . }}-api
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "bookstore.apiSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "bookstore.apiSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          {{- if eq (.Values.api.runtime | default "httpd") "python" }}
+          command: ["python3", "/app/server.py"]
+          {{- else }}
+          command: ["httpd", "-D", "FOREGROUND", "-f", "/app/httpd.conf"]
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.api.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+          volumeMounts:
+            - name: api-config
+              mountPath: /app/books.json
+              subPath: books.json
+            {{- if eq (.Values.api.runtime | default "httpd") "python" }}
+            - name: api-config
+              mountPath: /app/server.py
+              subPath: server.py
+            {{- else }}
+            - name: api-config
+              mountPath: /app/httpd.conf
+              subPath: httpd.conf
+            - name: api-config
+              mountPath: /var/www/html/books.json
+              subPath: books.json
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /books
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /books
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: api-config
+          configMap:
+            name: {{ include "bookstore.fullname" . }}-api

@@ -1,0 +1,40 @@
+# Production values — use: helm upgrade --install bookstore -f prod.yaml .
+# Replace REPLACE_CLUSTER_DOMAIN with your cluster apps domain (setup-lab.sh does this automatically).
+
+labels:
+  app.kubernetes.io/part-of: bookstore
+  environment: production
+
+web:
+  image:
+    repository: registry.redhat.io/rhel9/httpd-24
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+api:
+  runtime: httpd
+  image:
+    repository: registry.redhat.io/rhel9/httpd-24
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+route:
+  host: bookstore.apps.REPLACE_CLUSTER_DOMAIN
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

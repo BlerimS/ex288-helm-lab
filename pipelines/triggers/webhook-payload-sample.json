@@ -1,0 +1,10 @@
+{
+  "repository": {
+    "name": "bookstore-api",
+    "url": "https://github.com/example/bookstore-api.git",
+    "html_url": "https://github.com/example/bookstore-api"
+  },
+  "head_commit": {
+    "id": "abc123def456789"
+  }
+}

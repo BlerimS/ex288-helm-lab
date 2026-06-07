@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bookstore.fullname" . }}-web
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+data:
+  httpd.conf: |
+    Listen {{ .Values.web.port }}
+    ServerRoot "/etc/httpd"
+    DocumentRoot "/var/www/html"
+    LoadModule proxy_module modules/mod_proxy.so
+    LoadModule proxy_http_module modules/mod_proxy_http.so
+    LoadModule headers_module modules/mod_headers.so
+
+    <Directory "/var/www/html">
+      Require all granted
+    </Directory>
+
+    ProxyPass /api/books http://{{ include "bookstore.fullname" . }}-api:{{ .Values.api.port }}/books
+    ProxyPassReverse /api/books http://{{ include "bookstore.fullname" . }}-api:{{ .Values.api.port }}/books
+
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>Bookstore</title></head>
+    <body>
+      <h1>Bookstore Web</h1>
+      <p>API: <a href="/api/books">/api/books</a></p>
+    </body>
+    </html>

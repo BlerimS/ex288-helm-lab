@@ -1,0 +1,45 @@
+# EX288 lab starter — fix the TODO items before applying.
+apiVersion: triggers.tekton.dev/v1
+kind: TriggerTemplate
+metadata:
+  name: bookstore-template
+spec:
+  params:
+    - name: git-repo-url
+      description: The git repository url
+    - name: git-revision
+      description: The git revision
+      default: main
+    - name: git-repo-name
+      description: The name of the deployment to be created / patched
+
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: bookstore-build-$(tt.params.git-repo-name)-
+      spec:
+        taskRunTemplate:
+          serviceAccountName: pipeline
+        pipelineRef:
+          # TODO EX288: must reference your pipeline name
+          name: build-and-deploy
+        params:
+          - name: deployment-name
+            value: bookstore-api
+          - name: git-url
+            value: $(tt.params.git-repo-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: IMAGE
+            # TODO EX288: internal registry path must use project bookstore-cicd
+            value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/bookstore-api
+        workspaces:
+          - name: shared-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 500Mi

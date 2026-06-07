@@ -1,0 +1,14 @@
+# EX288 lab starter — fix the TODO items before applying.
+apiVersion: triggers.tekton.dev/v1
+kind: TriggerBinding
+metadata:
+  name: bookstore-binding
+spec:
+  params:
+    - name: git-repo-url
+      # TODO EX288: GitHub push payload field — use repository URL, not html_url
+      value: $(body.repository.html_url)
+    - name: git-repo-name
+      value: $(body.repository.name)
+    - name: git-revision
+      value: $(body.head_commit.id)

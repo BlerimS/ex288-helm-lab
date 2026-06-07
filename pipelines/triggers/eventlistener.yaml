@@ -1,0 +1,10 @@
+# EX288 lab starter — fix the TODO items before applying.
+apiVersion: triggers.tekton.dev/v1
+kind: EventListener
+metadata:
+  name: bookstore-listener
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    # TODO EX288: reference the Trigger you created
+    - triggerRef: vote-trigger

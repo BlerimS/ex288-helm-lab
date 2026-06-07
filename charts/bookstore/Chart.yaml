@@ -1,0 +1,12 @@
+apiVersion: v2
+name: bookstore
+description: Multi-container bookstore application (web + api) for EX288 practice
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - openshift
+  - ex288
+  - helm
+maintainers:
+  - name: lab-instructor

@@ -1,0 +1,62 @@
+# Default values — use devel.yaml or prod.yaml: helm upgrade --install bookstore -f devel.yaml .
+
+nameOverride: ""
+fullnameOverride: ""
+
+labels: {}
+  # app.kubernetes.io/part-of: bookstore
+  # environment: development
+
+web:
+  replicaCount: 1
+  image:
+    repository: registry.redhat.io/rhel9/httpd-24
+    tag: "1-XX"  # use latest available tag in your lab
+    pullPolicy: IfNotPresent
+  port: 8080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+api:
+  replicaCount: 1
+  runtime: httpd
+  image:
+    repository: registry.redhat.io/rhel9/httpd-24
+    tag: "1-XX"
+    pullPolicy: IfNotPresent
+  port: 8080
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+service:
+  type: ClusterIP
+
+route:
+  enabled: true
+  name: bookstore-web
+  host: ""
+  tls:
+    enabled: false
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+books:
+  - title: "OpenShift for Developers"
+    author: "Red Hat"
+    isbn: "978-EX288-001"
+  - title: "Kubernetes Patterns"
+    author: "Bilgin Ibryam"
+    isbn: "978-EX288-002"
+  - title: "Helm in Practice"
+    author: "Lab Team"
+    isbn: "978-EX288-003"
