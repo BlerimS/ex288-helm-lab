@@ -22,7 +22,7 @@ spec:
           {{- if eq (.Values.api.runtime | default "httpd") "python" }}
           command: ["python3", "/app/server.py"]
           {{- else }}
-          command: ["httpd", "-D", "FOREGROUND", "-f", "/app/httpd.conf"]
+          command: ["httpd", "-D", "FOREGROUND"]
           {{- end }}
           ports:
             - name: http
@@ -40,8 +40,8 @@ spec:
               subPath: server.py
             {{- else }}
             - name: api-config
-              mountPath: /app/httpd.conf
-              subPath: httpd.conf
+              mountPath: /etc/httpd/conf.d/bookstore-api.conf
+              subPath: bookstore-api.conf
             - name: api-config
               mountPath: /var/www/html/books.json
               subPath: books.json

@@ -6,18 +6,8 @@ metadata:
     {{- include "bookstore.labels" . | nindent 4 }}
     app.kubernetes.io/component: web
 data:
-  httpd.conf: |
-    Listen {{ .Values.web.port }}
-    ServerRoot "/etc/httpd"
-    DocumentRoot "/var/www/html"
-    LoadModule proxy_module modules/mod_proxy.so
-    LoadModule proxy_http_module modules/mod_proxy_http.so
-    LoadModule headers_module modules/mod_headers.so
-
-    <Directory "/var/www/html">
-      Require all granted
-    </Directory>
-
+  # Drop-in config — use the image default httpd.conf (includes mime.types, MPM, etc.)
+  bookstore.conf: |
     ProxyPass /api/books http://{{ include "bookstore.fullname" . }}-api:{{ .Values.api.port }}/books
     ProxyPassReverse /api/books http://{{ include "bookstore.fullname" . }}-api:{{ .Values.api.port }}/books
 

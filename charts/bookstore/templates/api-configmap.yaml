@@ -42,13 +42,7 @@ data:
 
     HTTPServer(("0.0.0.0", {{ .Values.api.port }}), Handler).serve_forever()
   {{- else }}
-  httpd.conf: |
-    Listen {{ .Values.api.port }}
-    ServerRoot "/etc/httpd"
-    DocumentRoot "/var/www/html"
-    <Directory "/var/www/html">
-      Require all granted
-    </Directory>
+  bookstore-api.conf: |
     Alias /books /var/www/html/books.json
     <Location /books>
       Header set Content-Type "application/json"
